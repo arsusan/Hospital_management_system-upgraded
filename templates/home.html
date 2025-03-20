@@ -1,0 +1,144 @@
+{% extends "base.html" %} {% block content %}
+<!-- Hero Section -->
+<section class="hero-section">
+  <div class="container">
+    <div class="hero-content text-center text-white">
+      <h1 class="display-3 fw-bold mb-4">Welcome to MediCare+</h1>
+      <p class="lead mb-5">
+        Advanced Healthcare Solutions with Compassionate Care
+      </p>
+      <div class="d-flex gap-3 justify-content-center">
+        <a href="#services" class="btn btn-light btn-lg px-5 py-3 rounded-pill">
+          Our Services <i class="fas fa-arrow-down ms-2"></i>
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Action Cards -->
+<section class="py-5 bg-light">
+  <div class="container">
+    <div class="row g-4 justify-content-center">
+      <div class="col-md-5">
+        <div class="card h-100 border-0 shadow-lg hover-scale">
+          <div class="card-body text-center p-5">
+            <i class="fas fa-sign-in-alt fa-3x text-primary mb-4"></i>
+            <h3 class="card-title mb-3">Existing Patients</h3>
+            <p class="card-text mb-4">
+              Access your medical records and manage appointments
+            </p>
+            <a
+              href="{{ url_for('routes.login') }}"
+              class="btn btn-primary px-4 py-2"
+            >
+              Login Now <i class="fas fa-chevron-right ms-2"></i>
+            </a>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-5">
+        <div class="card h-100 border-0 shadow-lg hover-scale">
+          <div class="card-body text-center p-5">
+            <i class="fas fa-user-plus fa-3x text-success mb-4"></i>
+            <h3 class="card-title mb-3">New Patients</h3>
+            <p class="card-text mb-4">
+              Create your account to access our services
+            </p>
+            <a
+              href="{{ url_for('routes.register') }}"
+              class="btn btn-success px-4 py-2"
+            >
+              Register Now <i class="fas fa-chevron-right ms-2"></i>
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Why Choose Us -->
+<section class="py-5" id="services">
+  <div class="container">
+    <div class="text-center mb-5">
+      <h2 class="display-5 fw-bold mb-3">Why Choose Us?</h2>
+      <p class="lead">
+        Excellence in healthcare through innovation and compassion
+      </p>
+    </div>
+
+    <div class="row g-4">
+      <div class="col-md-6 col-lg-3">
+        <div class="card h-100 border-0 shadow-sm">
+          <div class="card-body text-center p-4">
+            <div
+              class="icon-wrapper bg-primary text-white rounded-circle mx-auto mb-4"
+            >
+              <i class="fas fa-hospital fa-2x"></i>
+            </div>
+            <h5>Advanced Technology</h5>
+            <p>State-of-the-art medical equipment and facilities</p>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-6 col-lg-3">
+        <div class="card h-100 border-0 shadow-sm">
+          <div class="card-body text-center p-4">
+            <div
+              class="icon-wrapper bg-success text-white rounded-circle mx-auto mb-4"
+            >
+              <i class="fas fa-user-md fa-2x"></i>
+            </div>
+            <h5>Expert Specialists</h5>
+            <p>Board-certified physicians and surgeons</p>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-6 col-lg-3">
+        <div class="card h-100 border-0 shadow-sm">
+          <div class="card-body text-center p-4">
+            <div
+              class="icon-wrapper bg-info text-white rounded-circle mx-auto mb-4"
+            >
+              <i class="fas fa-clock fa-2x"></i>
+            </div>
+            <h5>24/7 Service</h5>
+            <p>Round-the-clock emergency care</p>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-6 col-lg-3">
+        <div class="card h-100 border-0 shadow-sm">
+          <div class="card-body text-center p-4">
+            <div
+              class="icon-wrapper bg-warning text-white rounded-circle mx-auto mb-4"
+            >
+              <i class="fas fa-heartbeat fa-2x"></i>
+            </div>
+            <h5>Patient Care</h5>
+            <p>Personalized treatment plans</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .hover-scale {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+  .hover-scale:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1) !important;
+  }
+  .icon-wrapper {
+    width: 70px;
+    height: 70px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+</style>
+{% endblock %}

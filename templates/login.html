@@ -1,0 +1,422 @@
+{% extends "base.html" %} {% block content %}
+<div class="login-container">
+  <!-- Animated Background -->
+  <div class="animated-bg">
+    <div class="shape"></div>
+    <div class="shape"></div>
+  </div>
+  <div class="flash-messages">
+    {% with messages = get_flashed_messages(with_categories=true) %} {% if
+    messages %} {% for category, message in messages %}
+    <div class="alert alert-{{ category }}">{{ message }}</div>
+    {% endfor %} {% endif %} {% endwith %}
+  </div>
+  <!-- Login Card -->
+  <div class="login-card">
+    <form method="POST" class="login-form">
+      {{ form.hidden_tag() }}
+
+      <!-- Dynamic Input Field -->
+      <div class="form-group">
+        <div class="input-wrapper">
+          <i class="fas fa-user input-icon"></i>
+          {% if form.staff_id is defined %} {{ form.staff_id(class="form-input",
+          placeholder=" ") }}
+          <label class="input-label">Staff ID</label>
+          {% else %} {{ form.username(class="form-input", placeholder=" ") }}
+          <label class="input-label">Username</label>
+          {% endif %}
+          <div class="underline"></div>
+        </div>
+      </div>
+
+      <!-- Password Input -->
+      <div class="form-group">
+        <div class="input-wrapper">
+          <i class="fas fa-lock input-icon"></i>
+          {{ form.password(class="form-input", placeholder=" ") }}
+          <label class="input-label">Password</label>
+          <div class="underline"></div>
+        </div>
+      </div>
+
+      <!-- Submit Button -->
+      <button type="submit" class="login-btn">
+        <span class="btn-text">
+          {% if form.staff_id is defined %}Staff Login{% else %}User Login{%
+          endif %}
+        </span>
+        <i class="fas fa-arrow-right btn-icon"></i>
+      </button>
+    </form>
+
+    <!-- Dynamic Links -->
+    <div class="additional-links">
+      {% if form.staff_id is defined %}
+      <a href="{{ url_for('routes.login') }}" class="link">User Login</a>
+      {% else %}
+      <a href="{{ url_for('routes.staff_login') }}" class="link">Staff Login</a>
+      {% endif %}
+      <span class="divider">|</span>
+      <a href="{{ url_for('routes.register') }}" class="link">Create Account</a>
+    </div>
+  </div>
+</div>
+
+<!-- Original CSS Styles (Unmodified) -->
+<style>
+  :root {
+    --primary: #2a2a72;
+    --secondary: #009ffd;
+    --accent: #00c9ff;
+    --white: #ffffff;
+    --glass: rgba(255, 255, 255, 0.1);
+    --responsive-primary: #2a2a72;
+    --responsive-secondary: #009ffd;
+  }
+
+  .login-container {
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: linear-gradient(
+      45deg,
+      var(--responsive-primary),
+      var(--responsive-secondary)
+    );
+    position: relative;
+    overflow: hidden;
+  }
+
+  .animated-bg {
+    position: absolute;
+    width: 200%;
+    height: 200%;
+    animation: rotate 20s linear infinite;
+  }
+
+  .animated-bg .shape {
+    position: absolute;
+    background: var(--glass);
+    border-radius: 50%;
+    filter: blur(80px);
+  }
+
+  .shape:nth-child(1) {
+    width: 600px;
+    height: 600px;
+    top: -100px;
+    left: -100px;
+    background: linear-gradient(45deg, var(--accent), transparent);
+  }
+
+  .shape:nth-child(2) {
+    width: 400px;
+    height: 400px;
+    bottom: -100px;
+    right: -100px;
+    background: linear-gradient(
+      45deg,
+      transparent,
+      var(--responsive-secondary)
+    );
+  }
+  .flash-messages {
+    position: absolute;
+    top: 20px;
+    width: 100%;
+    max-width: 400px;
+    z-index: 1000;
+  }
+
+  .alert {
+    padding: 15px;
+    margin-bottom: 1rem;
+    border-radius: 8px;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  .alert-warning {
+    background: rgba(255, 165, 0, 0.15);
+    color: #ffa500;
+  }
+
+  .alert-danger {
+    background: rgba(255, 0, 0, 0.15);
+    color: #ff0000;
+  }
+
+  .alert-success {
+    background: rgba(0, 255, 0, 0.15);
+    color: #00ff00;
+  }
+
+  .login-card {
+    position: relative;
+    background: var(--glass);
+    backdrop-filter: blur(20px);
+    border-radius: 20px;
+    padding: 40px;
+    width: 100%;
+    max-width: 400px;
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+    transform: translateY(20px);
+    opacity: 0;
+    animation: slideUp 0.8s cubic-bezier(0.23, 1, 0.32, 1) forwards;
+  }
+
+  .input-wrapper {
+    position: relative;
+    margin-bottom: 30px;
+  }
+
+  .form-input {
+    width: 100%;
+    padding: 15px 20px 15px 40px;
+    border: none;
+    background: var(--glass);
+    border-radius: 8px;
+    color: var(--white);
+    font-size: 16px;
+    transition: all 0.3s ease;
+  }
+
+  .form-input:focus {
+    outline: none;
+    background: rgba(255, 255, 255, 0.15);
+  }
+
+  .input-icon {
+    position: absolute;
+    left: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--white);
+    opacity: 0.7;
+    transition: all 0.3s ease;
+  }
+
+  .input-label {
+    position: absolute;
+    left: 40px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--white);
+    pointer-events: none;
+    transition: all 0.3s ease;
+    opacity: 0.7;
+  }
+
+  .form-input:focus ~ .input-label,
+  .form-input:not(:placeholder-shown) ~ .input-label {
+    transform: translate(-25px, -30px);
+    font-size: 12px;
+    opacity: 1;
+  }
+
+  .underline {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 0;
+    height: 2px;
+    background: var(--white);
+    transition: all 0.3s ease;
+  }
+
+  .form-input:focus ~ .underline {
+    width: 100%;
+  }
+
+  .login-btn {
+    width: 100%;
+    padding: 15px;
+    border: none;
+    border-radius: 8px;
+    background: linear-gradient(
+      45deg,
+      var(--responsive-primary),
+      var(--responsive-secondary)
+    );
+    color: var(--white);
+    font-size: 16px;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .login-btn::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+      45deg,
+      var(--responsive-secondary),
+      var(--responsive-primary)
+    );
+    transition: all 0.4s ease;
+    z-index: 1;
+  }
+
+  .login-btn:hover::before {
+    left: 0;
+  }
+
+  .btn-text,
+  .btn-icon {
+    position: relative;
+    z-index: 2;
+  }
+
+  .btn-icon {
+    transform: translateX(-10px);
+    opacity: 0;
+    transition: all 0.3s ease;
+  }
+
+  .login-btn:hover .btn-icon {
+    transform: translateX(0);
+    opacity: 1;
+  }
+
+  .additional-links {
+    margin-top: 25px;
+    text-align: center;
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+  }
+
+  .link {
+    color: var(--white);
+    text-decoration: none;
+    font-size: 14px;
+    position: relative;
+    opacity: 0.8;
+    transition: all 0.3s ease;
+  }
+
+  .link::after {
+    content: "";
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    width: 0;
+    height: 1px;
+    background: var(--white);
+    transition: all 0.3s ease;
+  }
+
+  .link:hover {
+    opacity: 1;
+  }
+
+  .link:hover::after {
+    width: 100%;
+  }
+
+  .divider {
+    color: var(--white);
+    opacity: 0.6;
+  }
+  /* Add to existing CSS */
+  .select-wrapper {
+    position: relative;
+    margin-bottom: 1.5rem;
+  }
+
+  .select-wrapper select {
+    width: 100%;
+    padding: 15px 20px 15px 40px;
+    background: var(--glass);
+    border: none;
+    border-radius: 8px;
+    color: var(--white);
+    appearance: none;
+    font-size: 16px;
+  }
+
+  .select-wrapper::after {
+    content: "\f078";
+    font-family: "Font Awesome 5 Free";
+    position: absolute;
+    right: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--white);
+    pointer-events: none;
+  }
+  /* Animations */
+  @keyframes slideUp {
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes rotate {
+    from {
+      transform: rotate(0deg);
+    }
+    to {
+      transform: rotate(360deg);
+    }
+  }
+
+  @media (max-width: 480px) {
+    .login-card {
+      margin: 20px;
+      padding: 30px;
+    }
+
+    :root {
+      --responsive-primary: #1a1a4a;
+      --responsive-secondary: #0077cc;
+    }
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --responsive-primary: #3a3a8a;
+      --responsive-secondary: #00aaff;
+    }
+  }
+</style>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const staffToggle = document.getElementById("staffToggle");
+    const loginForm = document.getElementById("loginForm");
+
+    // Initialize form action based on initial toggle state
+    loginForm.action = staffToggle.checked
+      ? "{{ url_for('routes.staff_login') }}"
+      : "{{ url_for('routes.login') }}";
+
+    // Update form action on toggle change
+    staffToggle.addEventListener("change", function () {
+      loginForm.action = this.checked
+        ? "{{ url_for('routes.staff_login') }}"
+        : "{{ url_for('routes.login') }}";
+    });
+
+    // Ensure form submission goes to correct endpoint
+    loginForm.addEventListener("submit", function (e) {
+      // Optional: Add visual feedback during submission
+      const btn = this.querySelector(".login-btn");
+      btn.style.opacity = "0.8";
+      btn.querySelector(".btn-text").textContent = "Authenticating...";
+    });
+  });
+</script>
+{% endblock %}

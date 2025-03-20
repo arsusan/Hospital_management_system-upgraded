@@ -1,0 +1,284 @@
+{% extends "base.html" %} {% block title %}Staff Dashboard{% endblock %} {%
+block banner_title %}Staff Dashboard{% endblock %} {% block content %}
+<div class="container">
+  <!-- Flash Messages -->
+  {% with messages = get_flashed_messages(with_categories=true) %} {% if
+  messages %} {% for category, message in messages %}
+  <div
+    class="alert alert-{{ category }} alert-dismissible fade show mt-3"
+    role="alert"
+  >
+    {{ message }}
+    <button
+      type="button"
+      class="btn-close"
+      data-bs-dismiss="alert"
+      aria-label="Close"
+    ></button>
+  </div>
+  {% endfor %} {% endif %} {% endwith %}
+
+  <div class="card mt-4 shadow-sm">
+    <div class="card-body">
+      <h2 class="card-title mb-4">Manage Availability</h2>
+
+      <!-- Calendar Container -->
+      <div id="calendar" class="mb-4"></div>
+
+      <!-- Calendar Control Form -->
+      <form
+        id="availabilityForm"
+        method="POST"
+        action="{{ url_for('routes.set_availability') }}"
+      >
+        {{ form.hidden_tag() }}
+        <input type="hidden" name="availability" id="availabilityInput" />
+        <button type="submit" class="btn btn-primary w-100">
+          Save Selected Time Slots
+        </button>
+        <div id="networkError" class="alert alert-danger mt-2 d-none"></div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- FullCalendar Resources -->
+<link
+  href="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.css"
+  rel="stylesheet"
+/>
+<script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.js"></script>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const calendarEl = document.getElementById("calendar");
+    const availabilityInput = document.getElementById("availabilityInput");
+    const networkError = document.getElementById("networkError");
+    let selectedSlots = [];
+
+    // Initialize FullCalendar
+    const calendar = new FullCalendar.Calendar(calendarEl, {
+      initialView: "timeGridWeek",
+      headerToolbar: {
+        left: "prev,next today",
+        center: "title",
+        right: "timeGridWeek,timeGridDay",
+      },
+      height: "auto", // Responsive height
+      selectable: true,
+      selectMirror: true,
+      selectOverlap: false,
+      events: {
+        url: "{{ url_for('routes.get_booked_slots') }}",
+        failure: () => showError("Failed to load schedule data"),
+        extraParams: { detailed: true },
+      },
+      eventContent: (arg) => {
+        if (arg.event.extendedProps.booked) {
+          const start = arg.event.start.toLocaleTimeString([], {
+            hour: "2-digit",
+            minute: "2-digit",
+          });
+          const end = arg.event.end.toLocaleTimeString([], {
+            hour: "2-digit",
+            minute: "2-digit",
+          });
+          return {
+            html: `<div class="fc-booked-slot">
+                <i class="fas fa-lock me-2"></i>
+                ${start} - ${end}
+              </div>`,
+          };
+        }
+      },
+      select: (info) => {
+        const start = info.start;
+        const end = info.end;
+
+        // Check for conflicts with existing events
+        const conflicts = calendar
+          .getEvents()
+          .filter((event) => event.start < end && event.end > start);
+
+        if (conflicts.length > 0) {
+          calendar.unselect();
+          showError("Selected time conflicts with an existing booking");
+          return;
+        }
+
+        // Add the selected slot
+        selectedSlots.push({
+          start: start.toISOString(),
+          end: end.toISOString(),
+          title: `${start.toLocaleTimeString([], {
+            hour: "2-digit",
+            minute: "2-digit",
+          })} - ${end.toLocaleTimeString([], {
+            hour: "2-digit",
+            minute: "2-digit",
+          })}`,
+        });
+
+        // Update the hidden input
+        availabilityInput.value = JSON.stringify(selectedSlots);
+
+        // Add the event to the calendar
+        calendar.addEvent({
+          title: `${start.toLocaleTimeString([], {
+            hour: "2-digit",
+            minute: "2-digit",
+          })} - ${end.toLocaleTimeString([], {
+            hour: "2-digit",
+            minute: "2-digit",
+          })}`,
+          start: start,
+          end: end,
+          color: "#4CAF50", // Green for available slots
+          display: "background",
+          editable: true,
+        });
+      },
+      eventClick: (info) => {
+        // Allow removal of only non-booked slots
+        if (!info.event.extendedProps.booked) {
+          const slotIndex = selectedSlots.findIndex(
+            (slot) => slot.start === info.event.start.toISOString()
+          );
+          if (slotIndex > -1) {
+            selectedSlots.splice(slotIndex, 1); // Remove the slot
+            availabilityInput.value = JSON.stringify(selectedSlots); // Update the hidden input
+          }
+          info.event.remove(); // Remove the event from the calendar
+        }
+      },
+    });
+
+    // Render the calendar
+    calendar.render();
+
+    // Form submission handler
+    document
+      .getElementById("availabilityForm")
+      .addEventListener("submit", async (e) => {
+        e.preventDefault();
+        clearError();
+
+        if (selectedSlots.length === 0) {
+          showError("Please select at least one time slot");
+          return;
+        }
+
+        try {
+          const response = await fetch(
+            "{{ url_for('routes.set_availability') }}",
+            {
+              method: "POST",
+              body: new FormData(e.target),
+              headers: {
+                Accept: "application/json",
+                "X-Requested-With": "XMLHttpRequest",
+              },
+            }
+          );
+
+          const data = await response.json();
+
+          if (data.success) {
+            // Show flash message
+            const flashDiv = document.createElement("div");
+            flashDiv.className = `alert alert-success alert-dismissible fade show mt-3`;
+            flashDiv.innerHTML = `
+          ${data.message}
+          <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        `;
+            document.querySelector(".container").prepend(flashDiv);
+
+            // Reset UI
+            calendar.refetchEvents();
+            selectedSlots = [];
+            availabilityInput.value = "";
+          } else {
+            showError(data.error || "Failed to save availability");
+          }
+        } catch (error) {
+          console.error("Error:", error);
+          showError("Failed to connect to server");
+        }
+      });
+
+    // Helper functions
+    function handleSuccess(message) {
+      calendar.refetchEvents(); // Refresh the calendar
+      selectedSlots = []; // Clear selected slots
+      availabilityInput.value = ""; // Clear the hidden input
+      showTemporaryMessage(
+        message || "Availability saved successfully!",
+        "success"
+      );
+    }
+
+    function showTemporaryMessage(message, type) {
+      const alert = document.createElement("div");
+      alert.className = `alert alert-${type} alert-dismissible fade show mt-3`;
+      alert.innerHTML = `
+      ${message}
+      <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    `;
+      document.querySelector(".container").prepend(alert);
+      setTimeout(() => alert.remove(), 3000);
+    }
+
+    function showError(message) {
+      networkError.textContent = message;
+      networkError.classList.remove("d-none");
+      setTimeout(() => networkError.classList.add("d-none"), 5000);
+    }
+
+    function clearError() {
+      networkError.classList.add("d-none");
+      networkError.textContent = "";
+    }
+  });
+</script>
+
+<style>
+  #calendar {
+    min-height: 600px;
+    margin: 20px 0;
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 15px rgba(0, 0, 0, 0.1);
+  }
+
+  .fc-booked-slot {
+    padding: 2px 5px;
+    border-radius: 3px;
+    background: repeating-linear-gradient(
+      45deg,
+      rgba(255, 68, 68, 0.1),
+      rgba(255, 68, 68, 0.1) 10px,
+      rgba(255, 68, 68, 0.05) 10px,
+      rgba(255, 68, 68, 0.05) 20px
+    );
+    border-left: 3px solid #ff4444;
+    color: #ff4444;
+    font-size: 0.9em;
+  }
+
+  .fc-event:not(.fc-booked-slot) {
+    background-color: #4caf50 !important;
+    border: none !important;
+    color: white !important;
+    padding: 2px 5px;
+  }
+
+  .fc-daygrid-event:hover {
+    opacity: 0.9;
+  }
+
+  #networkError {
+    transition: all 0.3s ease;
+  }
+</style>
+{% endblock %}

@@ -1,0 +1,86 @@
+[
+  {
+    "username": "john.doe",
+    "password": "password123",
+    "email": "john.doe@ar.com",
+    "years_of_working": 10
+  },
+  {
+    "username": "jane.smith",
+    "password": "securepass456",
+    "email": "jane.smith@ar.com",
+    "years_of_working": 8
+  },
+  {
+    "username": "michael.jones",
+    "password": "mike7890",
+    "email": "michael.jones@ar.com",
+    "years_of_working": 15
+  },
+  {
+    "username": "lisa.white",
+    "password": "lisa321",
+    "email": "lisa.white@ar.com",
+    "years_of_working": 6
+  },
+  {
+    "username": "david.miller",
+    "password": "dav12345",
+    "email": "david.miller@ar.com",
+    "years_of_working": 12
+  },
+  {
+    "username": "susan.taylor",
+    "password": "susantaylor2025",
+    "email": "susan.taylor@ar.com",
+    "years_of_working": 9
+  },
+  {
+    "username": "william.brown",
+    "password": "william2023",
+    "email": "william.brown@ar.com",
+    "years_of_working": 20
+  },
+  {
+    "username": "emily.johnson",
+    "password": "emilystrong7",
+    "email": "emily.johnson@ar.com",
+    "years_of_working": 4
+  },
+  {
+    "username": "joseph.davis",
+    "password": "josephsecure11",
+    "email": "joseph.davis@ar.com",
+    "years_of_working": 18
+  },
+  {
+    "username": "karen.moore",
+    "password": "karenm123",
+    "email": "karen.moore@ar.com",
+    "years_of_working": 14
+  },
+  {
+    "username": "charles.martin",
+    "password": "charles4567",
+    "email": "charles.martin@ar.com",
+    "years_of_working": 11
+  },
+  {
+    "username": "patricia.lee",
+    "password": "patricia999",
+    "email": "patricia.lee@ar.com",
+    "years_of_working": 7
+  },
+  {
+    "username": "josephine.clark",
+    "password": "josephine1234",
+    "email": "josephine.clark@ar.com",
+    "years_of_working": 9
+  },
+  {
+    "username": "henry.harris",
+    "password": "henrypass555",
+    "email": "henry.harris@ar.com",
+    "years_of_working": 17
+  }
+]

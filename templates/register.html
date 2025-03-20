@@ -1,0 +1,318 @@
+{% extends "base.html" %} {% block content %}
+<div class="login-container">
+  <!-- Animated Background -->
+  <div class="animated-bg">
+    <div class="shape"></div>
+    <div class="shape"></div>
+  </div>
+
+  <!-- Registration Card -->
+  <div class="container">
+    <div class="row justify-content-center">
+      <div class="col-12 col-md-8 col-lg-6">
+        <div class="login-card card shadow-lg">
+          <div class="card-body p-4 p-md-5">
+            <!-- Form Header -->
+            <div class="form-header text-center mb-4">
+              <h2 class="card-title mb-3">Join Our Health Community</h2>
+              <p class="text-muted">Begin your wellness journey today</p>
+            </div>
+
+            <form method="POST" action="{{ url_for('routes.register') }}">
+              {{ form.hidden_tag() }}
+
+              <!-- Username Field -->
+              <div class="form-group mb-4">
+                <div class="input-wrapper">
+                  <i class="fas fa-user-circle input-icon"></i>
+                  {{ form.username(class="form-control form-input",
+                  placeholder=" ") }}
+                  <label class="input-label">Username</label>
+                  <div class="underline"></div>
+                </div>
+                {% if form.username.errors %}
+                <div class="form-error">
+                  {% for error in form.username.errors %}{{ error }}{% endfor %}
+                </div>
+                {% endif %}
+              </div>
+
+              <!-- Email Field -->
+              <div class="form-group mb-4">
+                <div class="input-wrapper">
+                  <i class="fas fa-envelope input-icon"></i>
+                  {{ form.email(class="form-control form-input", placeholder="
+                  ") }}
+                  <label class="input-label">Email</label>
+                  <div class="underline"></div>
+                </div>
+                {% if form.email.errors %}
+                <div class="form-error">
+                  {% for error in form.email.errors %}{{ error }}{% endfor %}
+                </div>
+                {% endif %}
+              </div>
+
+              <!-- Password Field -->
+              <div class="form-group mb-4">
+                <div class="input-wrapper">
+                  <i class="fas fa-lock input-icon"></i>
+                  {{ form.password(class="form-control form-input",
+                  placeholder=" ") }}
+                  <label class="input-label">Password</label>
+                  <div class="underline"></div>
+                </div>
+                {% if form.password.errors %}
+                <div class="form-error">
+                  {% for error in form.password.errors %}{{ error }}{% endfor %}
+                </div>
+                {% endif %}
+              </div>
+
+              <!-- Confirm Password Field -->
+              <div class="form-group mb-4">
+                <div class="input-wrapper">
+                  <i class="fas fa-lock input-icon"></i>
+                  {{ form.confirm_password(class="form-control form-input",
+                  placeholder=" ") }}
+                  <label class="input-label">Confirm Password</label>
+                  <div class="underline"></div>
+                </div>
+                {% if form.confirm_password.errors %}
+                <div class="form-error">
+                  {% for error in form.confirm_password.errors %}{{ error }}{%
+                  endfor %}
+                </div>
+                {% endif %}
+              </div>
+
+              <!-- Submit Button -->
+              <button type="submit" class="login-btn btn w-100">
+                <span class="btn-text">Create Account</span>
+                <i class="fas fa-user-plus btn-icon"></i>
+              </button>
+
+              <!-- Additional Links -->
+              <div class="additional-links text-center mt-4">
+                <a href="{{ url_for('routes.login') }}" class="link">
+                  <i class="fas fa-sign-in-alt me-2"></i>Existing User? Login
+                  Here
+                </a>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% with messages = get_flashed_messages(with_categories=true) %} {% if messages
+%} {% for category, message in messages %}
+<div class="alert alert-{{ category }} mt-2">{{ message }}</div>
+{% endfor %} {% endif %} {% endwith %}
+
+<style>
+  :root {
+    --primary: #2a2a72;
+    --secondary: #009ffd;
+    --accent: #00c9ff;
+    --white: #ffffff;
+    --glass: rgba(255, 255, 255, 0.1);
+  }
+
+  .login-container {
+    min-height: 100vh;
+    background: linear-gradient(45deg, var(--primary), var(--secondary));
+    position: relative;
+    overflow: hidden;
+    padding: 80px 15px 30px; /* Top padding for nav */
+    z-index: 1;
+  }
+
+  .animated-bg {
+    position: absolute;
+    width: 200%;
+    height: 200%;
+    animation: rotate 20s linear infinite;
+  }
+
+  .animated-bg .shape {
+    position: absolute;
+    background: var(--glass);
+    border-radius: 50%;
+    filter: blur(80px);
+  }
+
+  .shape:nth-child(1) {
+    width: 600px;
+    height: 600px;
+    top: -100px;
+    left: -100px;
+    background: linear-gradient(45deg, var(--accent), transparent);
+  }
+
+  .shape:nth-child(2) {
+    width: 400px;
+    height: 400px;
+    bottom: -100px;
+    right: -100px;
+    background: linear-gradient(45deg, transparent, var(--secondary));
+  }
+
+  .login-card {
+    margin-top: 2rem; /* Added space below nav */
+    position: relative;
+    z-index: 2;
+    background: var(--glass);
+    backdrop-filter: blur(20px);
+    border-radius: 20px;
+    border: none;
+  }
+
+  .input-wrapper {
+    position: relative;
+  }
+
+  .form-input {
+    background: var(--glass);
+    border: none;
+    color: var(--white);
+    padding-left: 40px;
+    height: 50px;
+  }
+
+  .form-input:focus {
+    background: rgba(255, 255, 255, 0.15);
+    box-shadow: none;
+    color: var(--white);
+  }
+
+  .input-icon {
+    position: absolute;
+    left: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--white);
+    opacity: 0.7;
+    z-index: 4;
+  }
+
+  .input-label {
+    position: absolute;
+    left: 40px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--white);
+    pointer-events: none;
+    transition: all 0.3s ease;
+    opacity: 0.7;
+    z-index: 2;
+  }
+
+  .form-input:focus ~ .input-label,
+  .form-input:not(:placeholder-shown) ~ .input-label {
+    transform: translate(-25px, -30px);
+    font-size: 12px;
+    opacity: 1;
+  }
+
+  .underline {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 0;
+    height: 2px;
+    background: var(--white);
+    transition: all 0.3s ease;
+  }
+
+  .form-input:focus ~ .underline {
+    width: 100%;
+  }
+
+  .login-btn {
+    background: linear-gradient(45deg, var(--primary), var(--secondary));
+    border: none;
+    color: var(--white);
+    padding: 12px;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s ease;
+  }
+
+  .login-btn::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(45deg, var(--secondary), var(--primary));
+    transition: all 0.4s ease;
+    z-index: 1;
+  }
+
+  .login-btn:hover::before {
+    left: 0;
+  }
+
+  .btn-text,
+  .btn-icon {
+    position: relative;
+    z-index: 2;
+  }
+
+  .btn-icon {
+    transform: translateX(-10px);
+    opacity: 0;
+    transition: all 0.3s ease;
+  }
+
+  .login-btn:hover .btn-icon {
+    transform: translateX(0);
+    opacity: 1;
+  }
+
+  .form-error {
+    color: #ff4444;
+    font-size: 0.9rem;
+    margin-top: 0.5rem;
+    animation: shake 0.5s ease-in-out;
+  }
+
+  @keyframes rotate {
+    from {
+      transform: rotate(0deg);
+    }
+    to {
+      transform: rotate(360deg);
+    }
+  }
+
+  @keyframes shake {
+    0%,
+    100% {
+      transform: translateX(0);
+    }
+    25% {
+      transform: translateX(-5px);
+    }
+    50% {
+      transform: translateX(5px);
+    }
+    75% {
+      transform: translateX(-5px);
+    }
+  }
+
+  @media (max-width: 768px) {
+    .login-card {
+      margin: 0 15px;
+    }
+
+    .form-header h2 {
+      font-size: 1.75rem;
+    }
+  }
+</style>
+{% endblock %}

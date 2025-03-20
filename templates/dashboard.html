@@ -1,0 +1,282 @@
+{% extends "base.html" %} {% block title %}Dashboard{% endblock %} {% block
+content %}
+<div class="dashboard-container" style="padding-top: 80px">
+  <!-- Welcome Message -->
+  <div class="welcome-message text-center mb-5">
+    <h2>Welcome, {{ current_user.username }}!</h2>
+    <p class="lead">Manage your appointments and book new ones easily.</p>
+  </div>
+
+  <!-- Search Form -->
+  <!-- Search Form -->
+  <div class="search-card card mb-4 shadow-sm">
+    <div class="card-body">
+      <h4 class="card-title mb-4">Search for Doctors</h4>
+      <form method="GET" action="{{ url_for('routes.search') }}">
+        <div class="input-group">
+          <input
+            type="text"
+            name="query"
+            class="form-control"
+            placeholder="Search by doctor name or specialization"
+            value="{{ search_query if search_query }}"
+            required
+          />
+          <button type="submit" class="btn btn-primary">
+            <i class="fas fa-search me-2"></i>Search
+          </button>
+        </div>
+      </form>
+      {% if search_query %}
+      <p class="mt-3 mb-0 text-muted">
+        Showing results for: <strong>"{{ search_query }}"</strong>
+      </p>
+      {% endif %}
+    </div>
+  </div>
+
+  <!-- Available Appointments -->
+  <div class="available-appointments card mb-4 shadow-sm">
+    <div class="card-body">
+      <h4 class="card-title mb-4">Available Appointments</h4>
+      {% if doctors %} {% for doctor in doctors %} {% set available_slots =
+      doctor.availability|selectattr('is_booked',
+      'false')|selectattr('start_time', 'gt', current_time)|list %} {% if
+      available_slots %}
+      <div class="doctor-card mb-4 p-3 border rounded">
+        <h5 class="mb-3">
+          <i class="fas fa-user-md me-2"></i>{{ doctor.username }}
+        </h5>
+        <p class="text-muted mb-2">
+          <i class="fas fa-stethoscope me-2"></i>
+          Specialization: {{ doctor.specialization if doctor.specialization else
+          'Not specified' }}
+        </p>
+        <h6 class="mt-3 mb-2">
+          <i class="fas fa-calendar-alt me-2"></i>Available Slots:
+        </h6>
+        <div class="row">
+          {% for availability in available_slots %}
+          <div class="col-md-4 mb-3">
+            <div class="slot-card p-3 border rounded">
+              <p class="mb-2">
+                <i class="fas fa-clock me-2"></i>
+                {{ availability.start_time.strftime('%Y-%m-%d %H:%M') }} to {{
+                availability.end_time.strftime('%H:%M') }}
+              </p>
+              <form
+                method="POST"
+                action="{{ url_for('routes.book_appointment', doctor_id=doctor.id, slot_id=availability.id) }}"
+                class="booking-form"
+              >
+                <button type="submit" class="btn btn-success btn-sm w-100">
+                  <i class="fas fa-calendar-check me-2"></i>Book
+                </button>
+              </form>
+            </div>
+          </div>
+          {% else %}
+          <div class="col-12">
+            <p class="text-muted">No available slots.</p>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+      {% endif %} {% endfor %} {% else %}
+      <p class="text-muted">No doctors found.</p>
+      {% endif %}
+    </div>
+  </div>
+
+  <!-- Booked Appointments -->
+  <div class="booked-appointments card mb-4 shadow-sm">
+    <div class="card-body">
+      <h4 class="card-title mb-4">Your Appointments</h4>
+      <div class="table-responsive">
+        <table class="table table-hover">
+          <thead>
+            <tr>
+              <th><i class="fas fa-user-md me-2"></i>Doctor</th>
+              <th><i class="fas fa-calendar-day me-2"></i>Date</th>
+              <th><i class="fas fa-clock me-2"></i>Time</th>
+              <th><i class="fas fa-info-circle me-2"></i>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for appointment in appointments %} {% set appointment_datetime =
+            datetime.combine(appointment.date, appointment.time) %}
+            <tr
+              class="{% if appointment_datetime < current_time %}table-secondary{% endif %}"
+            >
+              <td>{{ appointment.doctor.username }}</td>
+              <td>{{ appointment.date.strftime('%Y-%m-%d') }}</td>
+              <td>{{ appointment.time.strftime('%H:%M') }}</td>
+              <td>
+                <span
+                  class="badge bg-{{ 'success' if appointment.status == 'Confirmed' else 'warning' }}"
+                >
+                  {% if appointment_datetime < current_time %} Expired {% else
+                  %} {{ appointment.status }} {% endif %}
+                </span>
+              </td>
+            </tr>
+            {% else %}
+            <tr>
+              <td colspan="4" class="text-muted text-center">
+                No appointments found.
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Confirmation Modal -->
+<div class="modal fade" id="confirmationModal" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Confirm Booking</h5>
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="modal"
+        ></button>
+      </div>
+      <div class="modal-body">
+        Are you sure you want to book this appointment?
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+          Cancel
+        </button>
+        <button type="button" class="btn btn-primary" id="confirmBooking">
+          Confirm
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Custom Styles -->
+<style>
+  :root {
+    --primary: #2a2a72;
+    --secondary: #009ffd;
+    --accent: #00c9ff;
+    --white: #ffffff;
+    --glass: rgba(255, 255, 255, 0.1);
+    --responsive-primary: #2a2a72;
+    --responsive-secondary: #009ffd;
+  }
+
+  .dashboard-container {
+    padding: 20px;
+    background: linear-gradient(
+      45deg,
+      var(--responsive-primary),
+      var(--responsive-secondary)
+    );
+    min-height: 100vh;
+  }
+
+  .welcome-message h2 {
+    color: var(--white);
+    font-size: 2.5rem;
+    font-weight: bold;
+  }
+
+  .welcome-message .lead {
+    color: var(--white);
+    opacity: 0.8;
+  }
+
+  .search-card,
+  .available-appointments,
+  .booked-appointments {
+    background: var(--glass);
+    backdrop-filter: blur(20px);
+    border-radius: 20px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+  }
+
+  .card-title {
+    color: var(--white);
+    font-size: 1.5rem;
+    font-weight: bold;
+  }
+
+  .doctor-card {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 15px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+
+  .doctor-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+  }
+
+  .slot-card {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+
+  .slot-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+  }
+
+  .badge {
+    font-size: 0.9em;
+    padding: 0.5em 0.75em;
+  }
+
+  .btn-primary,
+  .btn-success {
+    background: linear-gradient(
+      45deg,
+      var(--responsive-primary),
+      var(--responsive-secondary)
+    );
+    border: none;
+    transition: all 0.3s ease;
+  }
+
+  .btn-primary:hover,
+  .btn-success:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+  }
+</style>
+
+<!-- Confirmation Modal Script -->
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const bookingForms = document.querySelectorAll(".booking-form");
+    const confirmBookingBtn = document.getElementById("confirmBooking");
+    let currentForm = null;
+
+    bookingForms.forEach((form) => {
+      form.addEventListener("submit", function (e) {
+        e.preventDefault();
+        currentForm = form;
+        new bootstrap.Modal(
+          document.getElementById("confirmationModal")
+        ).show();
+      });
+    });
+
+    confirmBookingBtn.addEventListener("click", function () {
+      if (currentForm) {
+        currentForm.submit();
+      }
+    });
+  });
+</script>
+{% endblock %}
